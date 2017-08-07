@@ -9,6 +9,7 @@
 from relief import Unspecified, NotUnserializable
 from relief.utils import class_cloner, InheritingDictDescriptor
 from relief._compat import iteritems
+from relief.validation import Converted
 
 
 class BaseElement(object):
@@ -115,19 +116,6 @@ class BaseElement(object):
         """
         return raw_value
 
-    def validate(self, context=None):
-        """
-        Returns `True` when the element is valid and `False` otherwise, and
-        sets :attr:`is_valid` to the returned value.
-
-        The element will be considered invalid if :attr:`value` is
-        :data:`~relief.Unspecified` or :data:`~relief.NotUnserializable`.
-        """
-        if context is None:
-            context = {}
-        self.is_valid = self.value not in [Unspecified, NotUnserializable]
-        return self.is_valid
-
 
 class NativeMixin(object):
     """
@@ -205,7 +193,7 @@ class ValidatedByMixin(object):
                 validator(self, context) for validator in self.validators
             )
         else:
-            super(ValidatedByMixin, self).validate(context)
+            self.is_valid = Converted().validate(self, context)
         return self.is_valid
 
 
