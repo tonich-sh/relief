@@ -72,8 +72,8 @@ which is invoked like this::
 
    $ tox
 
-.. _pytest: http://pytest.org/latest/
-.. _tox: http://testrun.org/tox/latest/
+.. _pytest: https://docs.pytest.org/en/latest/
+.. _tox: https://tox.readthedocs.io/
 
 
 .. _code-of-conduct:
@@ -125,12 +125,10 @@ viewpoint doesn't mean that they're wrong. Don't forget that is is human to
 err and blaming each other doesn't get us anywhere, rather offer to help
 resolving issues and to help learn from mistakes.
 
-This text is a slightly modified version of the `Speak Up! Code of Conduct`_
+This text is a slightly modified version of the Speak Up! Code of Conduct
 which is available under a `CC BY 3.0`_ license and was inspired by the
 `Fedora Project`_ and the `Python Mentorship Project`_.
 
-
-.. _Speak Up! Code of Conduct: http://speakup.io/coc.html
 .. _CC BY 3.0: http://creativecommons.org/licenses/by/3.0
 .. _Fedora Project: http://fedoraproject.org/code-of-conduct
 .. _Python Mentorship Project: http://pythonmentors.com
