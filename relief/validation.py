@@ -16,10 +16,19 @@ from relief import Unspecified, NotUnserializable
 
 
 class Validator(object):
-    def validate(self, element, context):
+
+    @property
+    def valid(self):
+        return True
+
+    @property
+    def invalid(self):
         return False
 
-    def note_error(self, element, error, substitutions=None):
+    def validate(self, element, context):
+        return self.invalid
+
+    def note_error(self, element, error, context, substitutions=None):
         if substitutions is None:
             substitutions = {}
         element.errors.append(error.format(**substitutions))
@@ -31,7 +40,12 @@ class Validator(object):
         )
 
     def __call__(self, element, context):
-        return self.validate(element, context)
+        result = self.validate(element, context)
+        if result:
+            print('validate: {}[{}] ({}) by {} with {}'.format(element.__class__.__name__, context.get('name', 'unnamed'), element.raw_value, self.__class__.__name__, result))
+        else:
+            print('validate: {}[{}] ({}) by {} with {}'.format(element.__class__.__name__, context.get('name', 'unnamed'), element.raw_value, self.__class__.__name__, element.errors))
+        return result
 
 
 class Present(Validator):
@@ -41,11 +55,11 @@ class Present(Validator):
     #: Message that is stored in :attr:`Element.errors`.
     message = u"May not be blank."
 
-    def validate(self, element, state):
+    def validate(self, element, context):
         if element.value is Unspecified:
-            self.note_error(element, self.message)
-            return False
-        return True
+            self.note_error(element, self.message, context)
+            return self.invalid
+        return self.valid
 
 
 class Converted(Validator):
@@ -56,11 +70,11 @@ class Converted(Validator):
     #: Message that is stored in :attr:`Element.errors`.
     message = u"Not a valid value."
 
-    def validate(self, element, state):
+    def validate(self, element, context):
         if self.is_unusable(element):
-            self.note_error(element, self.message)
-            return False
-        return True
+            self.note_error(element, self.message, context)
+            return self.invalid
+        return self.valid
 
 
 class IsTrue(Validator):
@@ -72,9 +86,9 @@ class IsTrue(Validator):
 
     def validate(self, element, context):
         if self.is_unusable(element) or not element.value:
-            self.note_error(element, self.message)
-            return False
-        return True
+            self.note_error(element, self.message, context)
+            return self.invalid
+        return self.valid
 
 
 class IsFalse(Validator):
@@ -86,9 +100,9 @@ class IsFalse(Validator):
 
     def validate(self, element, context):
         if self.is_unusable(element) or element.value:
-            self.note_error(element, self.message)
-            return False
-        return True
+            self.note_error(element, self.message, context)
+            return self.invalid
+        return self.valid
 
 
 class ShorterThan(Validator):
@@ -108,10 +122,11 @@ class ShorterThan(Validator):
             self.note_error(
                 element,
                 self.message,
+                context,
                 substitutions={"upperbound": self.upperbound}
             )
-            return False
-        return True
+            return self.invalid
+        return self.valid
 
 
 class LongerThan(Validator):
@@ -131,10 +146,11 @@ class LongerThan(Validator):
             self.note_error(
                 element,
                 self.message,
+                context,
                 substitutions={"lowerbound": self.lowerbound}
             )
-            return False
-        return True
+            return self.invalid
+        return self.valid
 
 
 class LengthWithinRange(Validator):
@@ -154,13 +170,14 @@ class LengthWithinRange(Validator):
         if (not self.is_unusable(element) and
             self.start < len(element.value) < self.end
            ):
-            return True
+            return self.valid
         self.note_error(
             element,
             self.message,
+            context,
             substitutions={"start": self.start, "end": self.end}
         )
-        return False
+        return self.invalid
 
 
 class ContainedIn(Validator):
@@ -176,9 +193,9 @@ class ContainedIn(Validator):
 
     def validate(self, element, context):
         if element.value not in self.options:
-            self.note_error(element, u"Not a valid value.")
-            return False
-        return True
+            self.note_error(element, u"Not a valid value.", context)
+            return self.invalid
+        return self.valid
 
 
 class LessThan(Validator):
@@ -198,10 +215,11 @@ class LessThan(Validator):
             self.note_error(
                 element,
                 self.message,
+                context,
                 substitutions={"upperbound": self.upperbound}
             )
-            return False
-        return True
+            return self.invalid
+        return self.valid
 
 
 class GreaterThan(Validator):
@@ -221,10 +239,11 @@ class GreaterThan(Validator):
             self.note_error(
                 element,
                 self.message,
+                context,
                 substitutions={"lowerbound": self.lowerbound}
             )
-            return False
-        return True
+            return self.invalid
+        return self.valid
 
 
 class WithinRange(Validator):
@@ -242,13 +261,14 @@ class WithinRange(Validator):
 
     def validate(self, element, context):
         if not self.is_unusable(element) and self.start < element.value < self.end:
-            return True
+            return self.valid
         self.note_error(
             element,
             self.message,
+            context,
             substitutions={"start": self.start, "end": self.end}
         )
-        return False
+        return self.invalid
 
 
 class ItemsEqual(Validator):
@@ -272,13 +292,14 @@ class ItemsEqual(Validator):
         if (not self.is_unusable(element) and
             element.value[self.a[1]] == element.value[self.b[1]]
            ):
-            return True
+            return self.valid
         self.note_error(
             element,
             self.message,
+            context,
             substitutions={"a": self.a[0], "b": self.b[0]}
         )
-        return False
+        return self.invalid
 
 
 class AttributesEqual(Validator):
@@ -303,13 +324,14 @@ class AttributesEqual(Validator):
         if (not self.is_unusable(element) and
             getattr(element, self.a[1]).value == getattr(element, self.b[1]).value
            ):
-            return True
+            return self.valid
         self.note_error(
             element,
             self.message,
+            context,
             substitutions={"a": self.a[0], "b": self.b[0]}
         )
-        return False
+        return self.invalid
 
 
 class ProbablyAnEmailAddress(Validator):
@@ -335,12 +357,13 @@ class ProbablyAnEmailAddress(Validator):
             if u"." in host:
                 parts = host.split(u".")
                 if len(parts) >= 2:
-                    return True
+                    return self.valid
         self.note_error(
             element,
-            self.message
+            self.message,
+            context
         )
-        return False
+        return self.invalid
 
 
 class MatchesRegex(Validator):
@@ -363,9 +386,9 @@ class MatchesRegex(Validator):
 
     def validate(self, element, context):
         if not self.is_unusable(element) and self.regex.match(element.value):
-            return True
-        self.note_error(element, self.message)
-        return False
+            return self.valid
+        self.note_error(element, self.message, context)
+        return self.invalid
 
 
 class IsURL(Validator):
@@ -382,6 +405,6 @@ class IsURL(Validator):
         if not self.is_unusable(element):
             parsed = urlparse(element.value)
             if parsed.scheme and parsed.netloc:
-                return True
-        self.note_error(element, self.message)
-        return False
+                return self.valid
+        self.note_error(element, self.message, context)
+        return self.invalid

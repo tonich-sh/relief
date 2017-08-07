@@ -121,8 +121,8 @@ class MappingTest(ElementTest):
     def test_validate_value_empty(self, element_cls):
         element = element_cls({})
         assert element.is_valid is None
-        assert element.validate()
-        assert element.is_valid
+        assert not element.validate()
+        assert not element.is_valid
 
     def test_validate_value(self, element_cls):
         element = element_cls({"foo": "1"})

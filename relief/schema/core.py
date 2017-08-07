@@ -25,6 +25,7 @@ class BaseElement(object):
     #: A dictionary whose contents are inherited by subclasses, which should be
     #: used for application-specific information associated with an element.
     properties = InheritingDictDescriptor('properties')
+    name = 'unnamed'
 
     @class_cloner
     def using(cls, **kwargs):
@@ -193,7 +194,7 @@ class ValidatedByMixin(object):
                 validator(self, context) for validator in self.validators
             )
         else:
-            self.is_valid = Converted().validate(self, context)
+            self.is_valid = Converted()(self, context)
         return self.is_valid
 
 

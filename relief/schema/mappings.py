@@ -39,15 +39,19 @@ class Mapping(Container):
         if new_value is not Unspecified:
             raise AttributeError("can't set attribute")
 
+    def _get_key_element(self, value):
+        return self.member_schema[0].using(name=self.name + '_key')(value)
+
+    def _get_value_element(self, value):
+        return self.member_schema[1].using(name=self.name + '_value')(value)
+
     def _set_value_from_native(self, value):
         super(Mapping, self).clear()
         if value is not Unspecified:
             for key in value:
                 super(Mapping, self).__setitem__(
-                    # key, _Value(
-                    self.member_schema[0](key),
-                    self.member_schema[1](value[key])
-                # )
+                    self._get_key_element(key),
+                    self._get_value_element(value[key])
                 )
 
     def _set_value_from_raw(self, value):
@@ -55,10 +59,8 @@ class Mapping(Container):
         if value is not Unspecified:
             for key in value:
                 super(Mapping, self).__setitem__(
-                    # key, _Value(
-                    self.member_schema[0](key),
-                    self.member_schema[1](value[key])
-                # )
+                    self._get_key_element(key),
+                    self._get_value_element(value[key])
                 )
 
     def unserialize(self, raw_value):
@@ -82,7 +84,7 @@ class Mapping(Container):
         try:
             return self.__getitem__(key)
         except KeyError:
-            return self.member_schema[1](default)
+            return self._get_value_element(default)
 
     def __iter__(self):
         return super(Mapping, self).__iter__()
@@ -98,9 +100,11 @@ class Mapping(Container):
 
     def validate(self, context=None):
         if context is None:
+            # context = {'name': []}
             context = {}
-        self.is_valid = True
+        self.is_valid = len(list(self.keys())) > 0
         for key, value in iteritems(self):
+            # context['name'].append('{}.{}'.format(key.name, value.name))
             self.is_valid &= key.validate(context)
             self.is_valid &= value.validate(context)
         self.is_valid &= super(Mapping, self).validate(context)
@@ -174,7 +178,7 @@ class FormMeta(collections.Mapping.__class__, with_metaclass(Prepareable, type))
             member_schema.update(getattr(base, "member_schema", {}) or {})
         for name, attribute in iteritems(attributes):
             if isinstance(attribute, type) and issubclass(attribute, Element):
-                member_schema[name] = attribute
+                member_schema[name] = attribute.using(name=name)
         return super(FormMeta, cls).__new__(cls, cls_name, bases, attributes)
 
     def __prepare__(name, bases, **kwargs):
@@ -263,7 +267,7 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
 
         self._elements = _compat.OrderedDict()
         for name, element_cls in iteritems(self.member_schema):
-            self._elements[name] = element = element_cls()
+            self._elements[name] = element = element_cls.using(name=name)()
             setattr(self, name, element)
 
         return self
@@ -308,8 +312,8 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
             for element in itervalues(self):
                 element.set_from_native(value)
         else:
-            for key, value in iteritems(value):
-                self[key].set_from_native(value)
+            for key, lvalue in iteritems(value):
+                self[key].set_from_native(lvalue)
 
     def _set_value_from_raw(self, value):
         if value is Unspecified:
@@ -328,15 +332,19 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
                 raw_value = dict(raw_value)
             except (TypeError, ValueError):
                 return NotUnserializable
-        if set(raw_value) != set(self.member_schema):
+        if not set(raw_value).intersection(set(self.member_schema)):
             return NotUnserializable
         return raw_value
 
     def validate(self, context=None):
         if context is None:
+            # context = {'name': []}
             context = {}
         self.is_valid = True
-        for element in itervalues(self):
+        for key in self:
+            element = self[key]
+            # context['name'].append(element.name)
             self.is_valid &= element.validate(context=context)
+            # context['name'].pop(-1)
         self.is_valid &= super(Form, self).validate(context=context)
         return self.is_valid
