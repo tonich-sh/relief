@@ -20,13 +20,12 @@ from tests.schema.conftest import ElementTest
 class MappingTest(ElementTest):
     def test_getitem(self, element_cls):
         element = element_cls({u"foo": 1})
-        assert element[u"foo"].value == 1
+        assert element.value[u"foo"] == 1
 
     def test_get(self, element_cls):
         element = element_cls({u"foo": 1})
-        assert element.get(u"foo").value == 1
-        assert element.get(u"bar").value is NotUnserializable
-        assert element.get(u"bar").raw_value is None
+        assert element.value.get(u"foo") == 1
+        assert element.value.get(u"bar") is None
 
     def test_iter(self, element_cls):
         keys = list(element_cls({u"foo": 1}))
@@ -133,6 +132,14 @@ class MappingTest(ElementTest):
         assert element.validate()
         assert element.is_valid
 
+    def test_validate_value2(self, element2_cls):
+        element = element2_cls({"1": "foo"})
+        assert element.raw_value == {"1": "foo"}
+        assert element.value == {1: u"foo"}
+        assert element.is_valid is None
+        assert element.validate()
+        assert element.is_valid
+
     def test_validate_invalid_value(self, element_cls):
         element = element_cls({"foo": "foo"})
         assert element.raw_value == {"foo": "foo"}
@@ -162,6 +169,10 @@ class TestDict(MutableMappingTest):
     @pytest.fixture
     def element_cls(self):
         return Dict.of(Unicode, Integer)
+
+    @pytest.fixture
+    def element2_cls(self):
+        return Dict.of(Integer, Unicode)
 
     @pytest.fixture
     def possible_value(self):
@@ -195,6 +206,10 @@ class TestOrderedDict(MutableMappingTest):
     @pytest.fixture
     def element_cls(self):
         return OrderedDict.of(Unicode, Integer)
+
+    @pytest.fixture
+    def element2_cls(self):
+        return Dict.of(Integer, Unicode)
 
     @pytest.fixture
     def possible_value(self):

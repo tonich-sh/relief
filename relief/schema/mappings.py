@@ -16,14 +16,6 @@ from relief._compat import (
 )
 
 
-class _Value(object):
-    __slots__ = ["key", "value"]
-
-    def __init__(self, key, value):
-        self.key = key
-        self.value = value
-
-
 @add_native_itermethods
 class Mapping(Container):
     @class_cloner
@@ -50,24 +42,24 @@ class Mapping(Container):
     def _set_value_from_native(self, value):
         super(Mapping, self).clear()
         if value is not Unspecified:
-            if hasattr(self, "_raw_value"):
-                del self._raw_value
             for key in value:
-                super(Mapping, self).__setitem__(key, _Value(
+                super(Mapping, self).__setitem__(
+                    # key, _Value(
                     self.member_schema[0](key),
                     self.member_schema[1](value[key])
-                ))
+                # )
+                )
 
     def _set_value_from_raw(self, value):
         super(Mapping, self).clear()
         if value is not Unspecified:
-            if hasattr(self, "_raw_value"):
-                del self._raw_value
             for key in value:
-                super(Mapping, self).__setitem__(key, _Value(
+                super(Mapping, self).__setitem__(
+                    # key, _Value(
                     self.member_schema[0](key),
                     self.member_schema[1](value[key])
-                ))
+                # )
+                )
 
     def unserialize(self, raw_value):
         raw_value = super(Mapping, self).unserialize(raw_value)
@@ -79,7 +71,7 @@ class Mapping(Container):
             return NotUnserializable
 
     def __getitem__(self, key):
-        return super(Mapping, self).__getitem__(key).value
+        return super(Mapping, self).__getitem__(key)
 
     def __setitem__(self, key, value):
         raise TypeError(
@@ -93,17 +85,16 @@ class Mapping(Container):
             return self.member_schema[1](default)
 
     def __iter__(self):
-        for key in super(Mapping, self).__iter__():
-            yield super(Mapping, self).__getitem__(key).key
+        return super(Mapping, self).__iter__()
 
     def keys(self):
         return iter(self)
 
     def values(self):
-        return (self[key.value] for key in self)
+        return (self[key] for key in self)
 
     def items(self):
-        return ((key, self[key.value]) for key in self)
+        return ((key, self[key]) for key in self)
 
     def validate(self, context=None):
         if context is None:
@@ -173,7 +164,7 @@ class OrderedDict(Mapping, _compat.OrderedDict):
 
     def __reversed__(self):
         for key in super(OrderedDict, self).__reversed__():
-            yield super(_compat.OrderedDict, self).__getitem__(key).key
+            yield super(_compat.OrderedDict, self).__getitem__(key)
 
 
 class FormMeta(collections.Mapping.__class__, with_metaclass(Prepareable, type)):

@@ -14,7 +14,6 @@ import pytest
 from relief.utils import class_cloner, InheritingDictDescriptor
 
 
-
 class TestClassCloner(object):
     class Foo(object):
         @class_cloner
