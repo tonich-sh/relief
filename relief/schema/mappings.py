@@ -317,7 +317,7 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
                 if key not in self and self.schema_missing == 'ignore':
                     continue
                 self[key].set_from_native(lvalue)
-            for key in set(value).symmetric_difference(set(self)):
+            for key in set(self).difference(set(value)):
                 self[key]._set_default_value()
 
     def _set_value_from_raw(self, value):
@@ -329,7 +329,7 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
                 if key not in self and self.schema_missing == 'ignore':
                     continue
                 self[key].set_from_raw(lvalue)
-            for key in set(value).symmetric_difference(set(self)):
+            for key in set(self).difference(set(value)):
                 self[key]._set_default_value()
 
     def unserialize(self, raw_value):
