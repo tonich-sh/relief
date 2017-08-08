@@ -249,6 +249,7 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
        Added the ability to validate values with `validate_{key}` methods.
     """
     native_type = dict
+    schema_missing = None
 
     @class_cloner
     def of(cls, schema):
@@ -313,15 +314,23 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
                 element.set_from_native(value)
         else:
             for key, lvalue in iteritems(value):
+                if key not in self and self.schema_missing == 'ignore':
+                    continue
                 self[key].set_from_native(lvalue)
+            for key in set(value).symmetric_difference(set(self)):
+                self[key]._set_default_value()
 
     def _set_value_from_raw(self, value):
         if value is Unspecified:
             for element in itervalues(self):
                 element.set_from_raw(value)
         else:
-            for key, value in iteritems(value):
-                self[key].set_from_raw(value)
+            for key, lvalue in iteritems(value):
+                if key not in self and self.schema_missing == 'ignore':
+                    continue
+                self[key].set_from_raw(lvalue)
+            for key in set(value).symmetric_difference(set(self)):
+                self[key]._set_default_value()
 
     def unserialize(self, raw_value):
         raw_value = super(Form, self).unserialize(raw_value)

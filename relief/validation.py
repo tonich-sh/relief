@@ -7,6 +7,7 @@
     :license: BSD, see LICENSE.rst for details
 """
 import re
+
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -41,10 +42,13 @@ class Validator(object):
 
     def __call__(self, element, context):
         result = self.validate(element, context)
-        if result:
-            print('validate: {}[{}] ({}) by {} with {}'.format(element.__class__.__name__, context.get('name', 'unnamed'), element.raw_value, self.__class__.__name__, result))
-        else:
-            print('validate: {}[{}] ({}) by {} with {}'.format(element.__class__.__name__, context.get('name', 'unnamed'), element.raw_value, self.__class__.__name__, element.errors))
+        trace = context.get('trace', None)
+        if callable(trace):
+            trace(self, element, result)
+        # if result:
+        #     print('validate: {}[{}] ({}) by {} with {}'.format(element.__class__.__name__, getattr(element, 'name', 'unnamed'), element.raw_value, self.__class__.__name__, result))
+        # else:
+        #     print('validate: {}[{}] ({}) by {} with {}'.format(element.__class__.__name__, getattr(element, 'name', 'unnamed'), element.raw_value, self.__class__.__name__, element.errors))
         return result
 
 
