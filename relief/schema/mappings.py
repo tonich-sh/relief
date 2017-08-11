@@ -8,7 +8,7 @@
 """
 import collections
 
-from relief import Unspecified, NotUnserializable, Element, _compat
+from relief import Unspecified, NotUnserializable, Unnamed, Element, _compat
 from relief.utils import class_cloner
 from relief.schema.core import Container
 from relief._compat import (
@@ -40,10 +40,10 @@ class Mapping(Container):
             raise AttributeError("can't set attribute")
 
     def _get_key_element(self, value):
-        return self.member_schema[0].using(name=self.name + '_key')(value)
+        return self.member_schema[0].using(name=repr(self.name) + '_key')(value)
 
     def _get_value_element(self, value):
-        return self.member_schema[1].using(name=self.name + '_value')(value)
+        return self.member_schema[1].using(name=repr(self.name) + '_value')(value)
 
     def _set_value_from_native(self, value):
         super(Mapping, self).clear()
@@ -100,11 +100,9 @@ class Mapping(Container):
 
     def validate(self, context=None):
         if context is None:
-            # context = {'name': []}
             context = {}
         self.is_valid = len(list(self.keys())) > 0
         for key, value in iteritems(self):
-            # context['name'].append('{}.{}'.format(key.name, value.name))
             self.is_valid &= key.validate(context)
             self.is_valid &= value.validate(context)
         self.is_valid &= super(Mapping, self).validate(context)
@@ -178,7 +176,11 @@ class FormMeta(collections.Mapping.__class__, with_metaclass(Prepareable, type))
             member_schema.update(getattr(base, "member_schema", {}) or {})
         for name, attribute in iteritems(attributes):
             if isinstance(attribute, type) and issubclass(attribute, Element):
-                member_schema[name] = attribute.using(name=name)
+                if attribute.name != Unnamed and attribute.name not in member_schema:
+                    name = attribute.name
+                else:
+                    attribute = attribute.using(name=name)
+                member_schema[name] = attribute
         return super(FormMeta, cls).__new__(cls, cls_name, bases, attributes)
 
     def __prepare__(name, bases, **kwargs):
@@ -347,13 +349,10 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
 
     def validate(self, context=None):
         if context is None:
-            # context = {'name': []}
             context = {}
         self.is_valid = True
         for key in self:
             element = self[key]
-            # context['name'].append(element.name)
             self.is_valid &= element.validate(context=context)
-            # context['name'].pop(-1)
         self.is_valid &= super(Form, self).validate(context=context)
         return self.is_valid

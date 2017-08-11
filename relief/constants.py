@@ -46,3 +46,23 @@ class NotUnserializable(object):
 
     def __repr__(self):
         return self.__class__.__name__
+
+
+@as_singleton
+@implements_bool
+class Unnamed(object):
+    """
+    A constant that describes Unnamed elements.
+    """
+
+    def __bool__(self):
+        return False
+
+    def __str__(self):
+        return u'Unnamed'
+
+    def __bytes__(self):
+        return b'Unnamed'
+
+    def __repr__(self):
+        return self.__class__.__name__

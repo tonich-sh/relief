@@ -54,7 +54,7 @@ if PY2:
                                 return _index(name)
                             except ValueError:
                                 return 0
-                        assert get_index # silence pyflakes
+                        assert get_index  # silence pyflakes
                         break
                 else:
                     # If a subclass is created dynamically we won't find a code

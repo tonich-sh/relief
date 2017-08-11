@@ -6,7 +6,7 @@
     :copyright: 2013 by Daniel Neuhäuser
     :license: BSD, see LICENSE.rst for details
 """
-from relief import Unspecified, NotUnserializable
+from relief import Unspecified, NotUnserializable, Unnamed
 from relief.utils import class_cloner, InheritingDictDescriptor
 from relief._compat import iteritems
 from relief.validation import Converted
@@ -25,7 +25,7 @@ class BaseElement(object):
     #: A dictionary whose contents are inherited by subclasses, which should be
     #: used for application-specific information associated with an element.
     properties = InheritingDictDescriptor('properties')
-    name = 'unnamed'
+    name = Unnamed
 
     @class_cloner
     def using(cls, **kwargs):

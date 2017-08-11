@@ -6,7 +6,7 @@
     :copyright: 2013 by Daniel Neuhäuser
     :license: BSD, see LICENSE.rst for details
 """
-from relief.constants import Unspecified, NotUnserializable
+from relief.constants import Unspecified, NotUnserializable, Unnamed
 from relief.schema.core import Element
 from relief.schema.meta import Maybe
 from relief.schema.scalars import (
@@ -22,7 +22,7 @@ __version_info__ = (2, 1, 0)
 
 __all__ = [
     # constants
-    "Unspecified", "NotUnserializable",
+    "Unspecified", "NotUnserializable", "Unnamed"
     # core
     "Element",
     # scalars
