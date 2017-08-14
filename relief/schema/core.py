@@ -117,6 +117,9 @@ class BaseElement(object):
         """
         return raw_value
 
+    def __repr__(self):
+        return repr(self.value)
+
 
 class NativeMixin(object):
     """
