@@ -320,7 +320,7 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
                     continue
                 self[key].set_from_native(lvalue)
             for key in set(self).difference(set(value)):
-                self[key]._set_default_value()
+                self[key].set_from_native(Unspecified)
 
     def _set_value_from_raw(self, value):
         if value is Unspecified:
@@ -332,7 +332,7 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
                     continue
                 self[key].set_from_raw(lvalue)
             for key in set(self).difference(set(value)):
-                self[key]._set_default_value()
+                self[key].set_from_raw(Unspecified)
 
     def unserialize(self, raw_value):
         raw_value = super(Form, self).unserialize(raw_value)
