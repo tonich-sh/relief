@@ -234,11 +234,11 @@ def test_attributes_equal():
 
     form = Validated()
     assert not form.validate()
-    assert form.errors == [u"Spam and Eggs must be equal."]
+    assert len(form.errors) == 0  # Both Unspecified
 
     form = Validated("foo")
     assert not form.validate()
-    assert form.errors == [u"Spam and Eggs must be equal."]
+    assert len(form.errors) == 0  # Both Unspecified
 
 
 def test_probably_an_email_address():

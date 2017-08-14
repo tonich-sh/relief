@@ -10,7 +10,7 @@ import pytest
 
 from relief import (
     Dict, OrderedDict, Unicode, Integer, NotUnserializable, Form, Element,
-    _compat
+    Unspecified, _compat
 )
 
 from tests.conftest import python2_only
@@ -352,7 +352,7 @@ class TestForm(object):
 
         foo = Foo(1)
         assert foo.raw_value == 1
-        assert foo.value is NotUnserializable
+        assert foo.value == {'spam': Unspecified}
 
     def test_set_strict(self):
         value = {"spam": 1}
@@ -364,7 +364,7 @@ class TestForm(object):
         value = [("spam", 1)]
         form = Form.of({"spam": Integer}).using(strict=True)(value)
         assert form.raw_value == value
-        assert form.value is NotUnserializable
+        assert form.value == {'spam': Unspecified}
 
     def test_validate_empty(self):
         class Foo(Form):

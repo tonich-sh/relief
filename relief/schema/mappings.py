@@ -296,12 +296,12 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
 
     @property
     def value(self):
-        if self._state is not None:
-            return self._state
+        # if self._state is not None:
+        #     return self._state
         result = _compat.OrderedDict()
         for key, element in iteritems(self):
-            if element.value is Unspecified:
-                return NotUnserializable
+            # if element.value is Unspecified:
+            #     return NotUnserializable
             result[key] = element.value
         return result
 
