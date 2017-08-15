@@ -63,8 +63,8 @@ def test_is_true():
 def test_is_false():
     Validated = Unicode.validated_by([IsFalse()])
     unicode = Validated(u"")
-    assert unicode.validate()
-    assert not unicode.errors
+    assert not unicode.validate()
+    assert unicode.errors == [u"Must be false."]
 
     unicode = Validated(u"foobar")
     assert not unicode.validate()

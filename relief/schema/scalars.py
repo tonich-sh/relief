@@ -37,7 +37,13 @@ class Boolean(Element):
 class Number(Element):
     def unserialize(self, raw_value):
         raw_value = super(Number, self).unserialize(raw_value)
-        if raw_value is Unspecified or raw_value is NotUnserializable:
+        if raw_value is NotUnserializable:
+            return raw_value
+        if raw_value is Unspecified:
+            if self.default is not Unspecified:
+                return self.default
+            if self.default_factory is not Unspecified and callable(self.default_factory):
+                return self.default_factory()
             return raw_value
         if isinstance(raw_value, self.native_type):
             return raw_value

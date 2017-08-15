@@ -138,6 +138,8 @@ class NativeMixin(object):
     #: The "native" type represented by this element.
     native_type = None.__class__
 
+    empty_string_as = Unspecified
+
     def unserialize(self, raw_value):
         """
         Tries to unserialize the given `raw_value` and returns an object whose
@@ -148,6 +150,8 @@ class NativeMixin(object):
         """
         if self.strict and not isinstance(raw_value, self.native_type):
             return NotUnserializable
+        if isinstance(raw_value, str) and raw_value.strip() == '':
+            raw_value = self.empty_string_as
         return raw_value
 
 
