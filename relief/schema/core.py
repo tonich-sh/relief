@@ -120,8 +120,8 @@ class BaseElement(object):
         """
         return raw_value
 
-    def __repr__(self):
-        return repr(self.value)
+    def __str__(self):
+        return str(self.value)
 
 
 class NativeMixin(object):

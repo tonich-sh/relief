@@ -12,7 +12,7 @@ from relief import Unspecified, NotUnserializable, Unnamed, Element, _compat
 from relief.utils import class_cloner
 from relief.schema.core import Container
 from relief._compat import (
-    add_native_itermethods, Prepareable, itervalues, iteritems, with_metaclass
+    add_native_itermethods, Prepareable, itervalues, iteritems, with_metaclass, text_type
 )
 
 
@@ -40,10 +40,10 @@ class Mapping(Container):
             raise AttributeError("can't set attribute")
 
     def _get_key_element(self, value):
-        return self.member_schema[0].using(name=repr(self.name) + '_key')(value)
+        return self.member_schema[0].using(name=text_type(self.name) + '_key')(value)
 
     def _get_value_element(self, value):
-        return self.member_schema[1].using(name=repr(self.name) + '_value')(value)
+        return self.member_schema[1].using(name=text_type(self.name) + '_value')(value)
 
     def _set_value_from_native(self, value):
         super(Mapping, self).clear()
