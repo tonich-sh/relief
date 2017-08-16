@@ -8,7 +8,7 @@
 """
 from relief import Unspecified, NotUnserializable, Unnamed
 from relief.utils import class_cloner, InheritingDictDescriptor
-from relief._compat import iteritems
+from relief._compat import iteritems, text_type
 from relief.validation import Converted
 
 
@@ -150,7 +150,7 @@ class NativeMixin(object):
         """
         if self.strict and not isinstance(raw_value, self.native_type):
             return NotUnserializable
-        if isinstance(raw_value, str) and raw_value.strip() == '':
+        if isinstance(raw_value, text_type) and len(raw_value.strip()) == 0:
             raw_value = self.empty_string_as
         return raw_value
 

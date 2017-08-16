@@ -319,6 +319,8 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
                 if key not in self and self.schema_missing == 'ignore':
                     continue
                 self[key].set_from_native(lvalue)
+            for key in set(self).difference(set(value)):
+                self[key].set_from_native(Unspecified)
 
     def _set_value_from_raw(self, value):
         if value is Unspecified:
@@ -329,6 +331,8 @@ class Form(with_metaclass(FormMeta, collections.Mapping, Container)):
                 if key not in self and self.schema_missing == 'ignore':
                     continue
                 self[key].set_from_raw(lvalue)
+            for key in set(self).difference(set(value)):
+                self[key].set_from_raw(Unspecified)
 
     def unserialize(self, raw_value):
         raw_value = super(Form, self).unserialize(raw_value)

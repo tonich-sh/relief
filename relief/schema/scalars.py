@@ -22,14 +22,16 @@ class Boolean(Element):
     ``u"False"`` or ``b"False"`` it will unserialize to `False`.
     """
     native_type = bool
+    true_values = [u"True", b"True", u"true", b"true"]
+    false_values = [u"False", b"False", u"false", b"false"]
 
     def unserialize(self, raw_value):
         raw_value = super(Boolean, self).unserialize(raw_value)
         if isinstance(raw_value, bool) or raw_value is Unspecified:
             return raw_value
-        elif raw_value in [u"True", b"True"]:
+        elif raw_value in self.true_values:
             return True
-        elif raw_value in [u"False", b"False"]:
+        elif raw_value in self.false_values:
             return False
         return NotUnserializable
 
