@@ -8,12 +8,10 @@
 """
 import re
 
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
-
+from ._compat import urlparse
 from relief import Unspecified, NotUnserializable
+
+N_ = lambda totranslate: totranslate
 
 
 class Validator(object):
@@ -57,7 +55,7 @@ class Present(Validator):
     Validator that fails with :attr:`message` if the value is unspecified.
     """
     #: Message that is stored in :attr:`Element.errors`.
-    message = u"May not be blank."
+    message = N_(u"May not be blank.")
 
     def validate(self, element, context):
         if element.value is Unspecified:
@@ -72,7 +70,7 @@ class Converted(Validator):
     unserializable.
     """
     #: Message that is stored in :attr:`Element.errors`.
-    message = u"Not a valid value."
+    message = N_(u"Not a valid value.")
 
     def validate(self, element, context):
         if self.is_unusable(element):
@@ -86,7 +84,7 @@ class IsTrue(Validator):
     Validator that fails with :attr:`message` if the value is false-ish.
     """
     #: Message that is stored in :attr:`Element.errors`.
-    message = u"Must be true."
+    message = N_(u"Must be true.")
 
     def validate(self, element, context):
         if self.is_unusable(element) or not element.value:
@@ -100,7 +98,7 @@ class IsFalse(Validator):
     Validator that fails with :attr:`message` if the value is true-ish.
     """
     #: Message that is stored in :attr:`Element.errors`.
-    message = u"Must be false."
+    message = N_(u"Must be false.")
 
     def validate(self, element, context):
         if self.is_unusable(element) or element.value:
@@ -116,7 +114,7 @@ class ShorterThan(Validator):
     """
     #: Message that is stored in :attr:`Element.errors`. ``{upperbound}`` in
     #: the message is substituted with the given `upperbound`.
-    message = u"Must be shorter than {upperbound}."
+    message = N_(u"Must be shorter than {upperbound}.")
 
     def __init__(self, upperbound):
         self.upperbound = upperbound
@@ -140,7 +138,7 @@ class LongerThan(Validator):
     """
     #: Message that is stored in :attr:`Element.errors`. ``{lowerbound}`` in
     #: the message is substituted with the given `lowerbound`.
-    message = u"Must be longer than {lowerbound}."
+    message = N_(u"Must be longer than {lowerbound}.")
 
     def __init__(self, lowerbound):
         self.lowerbound = lowerbound
@@ -164,7 +162,7 @@ class LengthWithinRange(Validator):
     """
     #: Message that is stored in :attr:`Element.errors`. ``{start}`` and
     #: ``{end}`` is substituted with the given `start` and `end`.
-    message = u"Must be longer than {start} and shorter than {end}."
+    message = N_(u"Must be longer than {start} and shorter than {end}.")
 
     def __init__(self, start, end):
         self.start = start
@@ -190,7 +188,7 @@ class ContainedIn(Validator):
     contained in `options`.
     """
     #: Message that is stored in :attr:`Element.errors`.
-    message = u"Not a valid value."
+    message = N_(u"Not a valid value.")
 
     def __init__(self, options):
         self.options = options
@@ -209,7 +207,7 @@ class LessThan(Validator):
     """
     #: Message that is stored in :attr:`Element.errors`. ``{upperbound}`` is
     #: substituted with the given `upperbound`.
-    message = u"Must be less than {upperbound}."
+    message = N_(u"Must be less than {upperbound}.")
 
     def __init__(self, upperbound):
         self.upperbound = upperbound
@@ -233,7 +231,7 @@ class GreaterThan(Validator):
     """
     #: Message that is stored in the :attr:`Element.errors`. ``{lowerbound}``
     #: is substituted with the given `lowerbound`.
-    message = u"Must be greater than {lowerbound}."
+    message = N_(u"Must be greater than {lowerbound}.")
 
     def __init__(self, lowerbound):
         self.lowerbound = lowerbound
@@ -257,7 +255,7 @@ class WithinRange(Validator):
     """
     #: Message that is stored in :attr:`Element.errors`. ``{start}`` and
     #: ``{end}`` are substituted with the given `start` and `end`.
-    message = u"Must be greater than {start} and shorter than {end}."
+    message = N_(u"Must be greater than {start} and shorter than {end}.")
 
     def __init__(self, start, end):
         self.start = start
@@ -286,7 +284,7 @@ class ItemsEqual(Validator):
     """
     #: Message that is stored in :attr:`Element.errors`. ``{a}`` and ``{b}``
     #: are substituted with the labels in the given `a` and `b`.
-    message = u"{a} and {b} must be equal."
+    message = N_(u"{a} and {b} must be equal.")
 
     def __init__(self, a, b):
         self.a = a
@@ -318,7 +316,7 @@ class AttributesEqual(Validator):
     """
     #: Message that is stored in :attr:`Element.errors`. ``{a}`` and ``{b}``
     #: are substituted with the labels in the given `a` and `b`.
-    message = u"{a} and {b} must be equal."
+    message = N_(u"{a} and {b} must be equal.")
 
     def __init__(self, a, b):
         self.a = a
@@ -353,7 +351,7 @@ class ProbablyAnEmailAddress(Validator):
     and wait for a response.
     """
     #: Message that is stored in the :attr:`Element.errors`.
-    message = u"Must be a valid e-mail address."
+    message = N_(u"Must be a valid e-mail address.")
 
     def validate(self, element, context):
         if not self.is_unusable(element) and u"@" in element.value:
@@ -381,7 +379,7 @@ class MatchesRegex(Validator):
     regex = u''
 
     #: Message that is stored in :attr:`Element.errors`.
-    message = u'Must be a valid value.'
+    message = N_(u'Must be a valid value.')
 
     def __init__(self, regex=None):
         if regex is None:
@@ -403,7 +401,7 @@ class IsURL(Validator):
     .. versionadded:: 2.1.0
     """
     #: Message that is stored in :attr:`Element.errors`.
-    message = u'Must be a URL.'
+    message = N_(u'Must be a URL.')
 
     def validate(self, element, context):
         if not self.is_unusable(element):

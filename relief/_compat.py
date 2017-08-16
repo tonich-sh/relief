@@ -17,6 +17,10 @@ try:
     from collections import OrderedDict
 except ImportError: # < 2.7
     from ordereddict import OrderedDict
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 
 PY2 = sys.version_info[0] == 2

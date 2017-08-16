@@ -6,6 +6,9 @@
     :copyright: 2013 by Daniel Neuhäuser
     :license: BSD, see LICENSE.rst for details
 """
+
+import gettext
+
 from relief import Unspecified, NotUnserializable, Unnamed
 from relief.utils import class_cloner, InheritingDictDescriptor
 from relief._compat import iteritems, text_type
@@ -179,6 +182,13 @@ class ValidatedByMixin(object):
         #: A list that is supposed to be populated with unicode strings by a
         #: validator as an explanation of why the element is invalid.
         self.errors = []
+
+    @property
+    def local_errors(self):
+        errors = []
+        for error in self.errors:
+            errors.append(gettext.dgettext('relief', error))
+        return errors
 
     def validate(self, context=None):
         """
